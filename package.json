@@ -1,0 +1,32 @@
+{
+  "name": "lazy-cacache",
+  "version": "1.0.1",
+  "description": "a wrap class of cacache",
+  "homepage": "https://github.com/bluelovers/node-lazy-cacache#readme",
+  "bugs": {
+    "url": "https://github.com/bluelovers/node-lazy-cacache/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bluelovers/node-lazy-cacache.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@types/bluebird": "^3.5.24",
+    "bluebird": "^3.5.2",
+    "cacache": "^11.2.0",
+    "cache-path": "^1.0.2",
+    "debug-color2": "^1.0.6",
+    "fs-extra": "^7.0.0"
+  },
+  "devDependencies": {}
+}
