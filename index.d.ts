@@ -40,6 +40,8 @@ export declare class Cacache {
     list<M>(): bluebird<ICacacheList<M>>;
     readData<D = Buffer, M = any>(key: string, options?: ICacacheOptionsCore): bluebird<ICacacheData<D, M>>;
     readJSON<D = any, M = any>(key: string, options?: ICacacheOptionsCore): bluebird<ICacacheJSON<D, M>>;
+    readDataIfExists<D = Buffer, M = any>(key: string, options?: ICacacheOptionsPlus): bluebird<ICacacheData<D, M>>;
+    readJSONIfExists<D = Buffer, M = any>(key: string, options?: ICacacheOptionsPlus): bluebird<ICacacheJSON<D, M>>;
     readDataInfo<M>(key: string, options?: ICacacheOptionsCore): bluebird<ICacacheListEntry<M>>;
     hasContent<O>(integrity: string): bluebird<ICacacheDataHasContent<O>>;
     hasData<M>(key: string, options?: ICacacheOptionsPlus): bluebird<ICacacheListEntry<M>>;

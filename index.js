@@ -57,6 +57,28 @@ class Cacache {
             return ret2;
         });
     }
+    readDataIfExists(key, options) {
+        let self = this;
+        return this.hasData(key, options)
+            .bind(this)
+            .then(function (v) {
+            if (v) {
+                return self.readData(key, options);
+            }
+            return null;
+        });
+    }
+    readJSONIfExists(key, options) {
+        let self = this;
+        return this.hasData(key, options)
+            .bind(this)
+            .then(function (v) {
+            if (v) {
+                return self.readJSON(key, options);
+            }
+            return null;
+        });
+    }
     readDataInfo(key, options) {
         return bluebird
             .resolve(cacache.get.info(this.cachePath, key, options));

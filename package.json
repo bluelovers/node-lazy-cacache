@@ -1,6 +1,6 @@
 {
   "name": "lazy-cacache",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "a wrap class of cacache",
   "homepage": "https://github.com/bluelovers/node-lazy-cacache#readme",
   "bugs": {

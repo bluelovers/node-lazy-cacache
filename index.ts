@@ -136,6 +136,46 @@ export class Cacache
 			;
 	}
 
+	readDataIfExists<D = Buffer, M = any>(key: string,
+		options?: ICacacheOptionsPlus,
+	): bluebird<ICacacheData<D, M>>
+	{
+		let self = this;
+
+		return this.hasData(key, options)
+			.bind(this)
+			.then(function (this: Cacache, v)
+			{
+				if (v)
+				{
+					return self.readData<D, M>(key, options)
+				}
+
+				return null;
+			})
+		;
+	}
+
+	readJSONIfExists<D = Buffer, M = any>(key: string,
+		options?: ICacacheOptionsPlus,
+	): bluebird<ICacacheJSON<D, M>>
+	{
+		let self = this;
+
+		return this.hasData(key, options)
+			.bind(this)
+			.then(function (this: Cacache, v)
+			{
+				if (v)
+				{
+					return self.readJSON<D, M>(key, options)
+				}
+
+				return null;
+			})
+			;
+	}
+
 	readDataInfo<M>(key: string,
 		options?: ICacacheOptionsCore,
 	): bluebird<ICacacheListEntry<M>>
