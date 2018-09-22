@@ -219,7 +219,7 @@ export class Cacache
 			;
 	}
 
-	writeData<O>(key: string,
+	writeData<O = any>(key: string,
 		data: string | DataView | TypedArray,
 		options?: ICacacheOptionsCore,
 	): bluebird<ICacacheIntegrity<ICacacheHash<O>>>
@@ -229,7 +229,7 @@ export class Cacache
 			;
 	}
 
-	writeJSON<O>(key: string, data, options?: ICacacheOptionsCore)
+	writeJSON<O = any>(key: string, data, options?: ICacacheOptionsCore)
 	{
 		return this.writeData<O>(key, JSON.stringify(data), options);
 	}

@@ -45,8 +45,8 @@ export declare class Cacache {
     readDataInfo<M>(key: string, options?: ICacacheOptionsCore): bluebird<ICacacheListEntry<M>>;
     hasContent<O>(integrity: string): bluebird<ICacacheDataHasContent<O>>;
     hasData<M>(key: string, options?: ICacacheOptionsPlus): bluebird<ICacacheListEntry<M>>;
-    writeData<O>(key: string, data: string | DataView | TypedArray, options?: ICacacheOptionsCore): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
-    writeJSON<O>(key: string, data: any, options?: ICacacheOptionsCore): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
+    writeData<O = any>(key: string, data: string | DataView | TypedArray, options?: ICacacheOptionsCore): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
+    writeJSON<O = any>(key: string, data: any, options?: ICacacheOptionsCore): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
     removeAll(): bluebird<void>;
     remove(key: string): bluebird<void>;
     removeContent(data_integrity: string): bluebird<void>;
