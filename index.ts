@@ -3,7 +3,7 @@ import bluebird = require('bluebird');
 import TypedArray = NodeJS.TypedArray;
 import crypto = require('crypto');
 import { IOptions as IGetCachePathOptions } from 'cache-path';
-import { getCacheDirPath, debugConsole, getOptionsAsync, getOptions } from './lib/util';
+import { getCacheDirPath, debugConsole, getOptionsAsync, getOptions, deleteEmpty } from './lib/util';
 import * as fs from 'fs-extra';
 import { _bucketPath, _hashEntry } from 'cacache/lib/entry-index';
 import contentPath = require('cacache/lib/content/path');
@@ -356,6 +356,8 @@ export class Cacache
 				{
 					await fs.remove(bucket.fullpath)
 				}
+
+				await deleteEmpty(self.cachePath);
 			})
 			;
 	}

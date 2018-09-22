@@ -2,6 +2,9 @@ import { getCachePath, findNpmCachePath, getOSTempPath, findPkgModulePath, getCa
 import bluebird = require('bluebird');
 import { Console } from 'debug-color2';
 import { ICacacheOptions } from '../index';
+import deleteEmpty = require('delete-empty');
+
+export { deleteEmpty }
 
 export const debugConsole = new Console(null, {
 	label: true,

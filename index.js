@@ -183,6 +183,7 @@ class Cacache {
             else {
                 await fs.remove(bucket.fullpath);
             }
+            await util_1.deleteEmpty(self.cachePath);
         });
     }
     removeContent(data_integrity) {

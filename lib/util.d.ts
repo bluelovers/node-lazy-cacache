@@ -1,6 +1,8 @@
 import bluebird = require('bluebird');
 import { Console } from 'debug-color2';
 import { ICacacheOptions } from '../index';
+import deleteEmpty = require('delete-empty');
+export { deleteEmpty };
 export declare const debugConsole: Console;
 export declare function enableDebug(bool?: boolean): boolean;
 export declare function getCacheDirPath(name: string, options: ICacacheOptions, isAsync: true): bluebird<string>;
