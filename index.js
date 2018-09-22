@@ -4,6 +4,10 @@ const bluebird = require("bluebird");
 const crypto = require("crypto");
 const util_1 = require("./lib/util");
 const fs = require("fs-extra");
+const entry_index_1 = require("cacache/lib/entry-index");
+const contentPath = require("cacache/lib/content/path");
+const path = require("upath2");
+const ssri = require("ssri");
 class Cacache {
     static getHashes() {
         return crypto.getHashes();
@@ -106,16 +110,80 @@ class Cacache {
     }
     writeData(key, data, options) {
         return bluebird
-            .resolve(cacache.put(this.cachePath, key, data, options));
+            .resolve(cacache.put(this.cachePath, key, data, options))
+            .bind(this);
     }
     writeJSON(key, data, options) {
         return this.writeData(key, JSON.stringify(data), options);
+    }
+    writeDataAndClear(key, data, options) {
+        let self = this;
+        return this.writeData(key, data, options)
+            .tap(function () {
+            return self.clearKey(key, true);
+        });
+    }
+    writeJSONAndClear(key, data, options) {
+        let self = this;
+        return this.writeJSON(key, data, options)
+            .tap(function () {
+            return self.clearKey(key, true);
+        });
     }
     removeAll() {
         return bluebird.resolve(cacache.rm.all(this.cachePath));
     }
     remove(key) {
         return bluebird.resolve(cacache.rm.entry(this.cachePath, key));
+    }
+    _ssriData(data) {
+        return ssri.fromData(data);
+    }
+    _ssriJSON(data, integrity) {
+        return this.hashData(JSON.stringify(data));
+    }
+    hashData(data) {
+        return ssri.stringify(this._ssriData(data));
+    }
+    hashJSON(data) {
+        return this.hashData(JSON.stringify(data));
+    }
+    clearKey(key, keepLatest) {
+        let self = this;
+        return bluebird
+            .resolve(this.bucketEntries(key))
+            .bind(this)
+            .reduce(async function (latest, next) {
+            if (next.key === key) {
+                if (latest.time > next.time) {
+                    [latest, next] = [next, latest];
+                }
+                if (next.integrity != latest.integrity) {
+                    await self.removeContent(latest.integrity);
+                }
+                latest = next;
+            }
+            return latest;
+        })
+            .then(async function (latest) {
+            if (!keepLatest) {
+                await self.removeContent(latest.integrity);
+                return null;
+            }
+            return latest;
+        })
+            .tap(async function (latest) {
+            let bucket = self.bucketPath(key);
+            if (latest) {
+                let entry = Object.assign({}, latest);
+                delete entry.path;
+                let stringified = JSON.stringify(entry);
+                await fs.writeFile(bucket.fullpath, "\n" + `${entry_index_1._hashEntry(stringified)}\t${stringified}`);
+            }
+            else {
+                await fs.remove(bucket.fullpath);
+            }
+        });
     }
     removeContent(data_integrity) {
         return bluebird.resolve(cacache.rm.content(this.cachePath, data_integrity));
@@ -130,6 +198,58 @@ class Cacache {
     withTempDirPath(options) {
         return new bluebird((resolve, reject) => {
             cacache.tmp.withTmp(this.cachePath, resolve, options);
+        });
+    }
+    bucketPath(key) {
+        let fullpath = entry_index_1._bucketPath(this.cachePath, key);
+        let p = path.relative(this.cachePath, fullpath);
+        return {
+            fullpath,
+            path: p,
+        };
+    }
+    contentPath(integrity) {
+        let fullpath = contentPath(this.cachePath, integrity);
+        let p = path.relative(this.cachePath, fullpath);
+        return {
+            fullpath,
+            path: p,
+        };
+    }
+    bucketEntries(key) {
+        let self = this;
+        return bluebird.resolve()
+            .bind(this)
+            .then(function () {
+            let bucket = self.bucketPath(key);
+            return fs.readFile(bucket.fullpath, 'utf8')
+                .then(data => {
+                let entries = [];
+                data.split('\n').forEach(entry => {
+                    if (!entry) {
+                        return;
+                    }
+                    const pieces = entry.split('\t');
+                    if (!pieces[1] || entry_index_1._hashEntry(pieces[1]) !== pieces[0]) {
+                        // Hash is no good! Corruption or malice? Doesn't matter!
+                        // EJECT EJECT
+                        return;
+                    }
+                    let obj;
+                    try {
+                        obj = JSON.parse(pieces[1]);
+                    }
+                    catch (e) {
+                        // Entry is corrupted!
+                        return;
+                    }
+                    if (obj) {
+                        obj.path = self.contentPath(obj.integrity).fullpath;
+                        entries.push(obj);
+                    }
+                });
+                return entries;
+            });
         });
     }
 }

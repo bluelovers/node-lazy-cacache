@@ -21,12 +21,13 @@ export interface ICacacheOptions extends ICacacheOptionsCore {
      */
     autoCreateDir?: boolean;
 }
-export interface ICacacheOptionsCore {
+export interface ICacacheOptionsCore<M = any> {
     integrity?: any;
     algorithms?: ICacacheAlgorithm;
     memoize?: any;
     uid?: any;
     git?: any;
+    metadata?: M;
 }
 export interface ICacacheOptionsPlus extends ICacacheOptionsCore {
     ttl?: number;
@@ -45,14 +46,30 @@ export declare class Cacache {
     readDataInfo<M>(key: string, options?: ICacacheOptionsCore): bluebird<ICacacheListEntry<M>>;
     hasContent<O>(integrity: string): bluebird<ICacacheDataHasContent<O>>;
     hasData<M>(key: string, options?: ICacacheOptionsPlus): bluebird<ICacacheListEntry<M>>;
-    writeData<O = any>(key: string, data: string | DataView | TypedArray, options?: ICacacheOptionsCore): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
-    writeJSON<O = any>(key: string, data: any, options?: ICacacheOptionsCore): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
+    writeData<O = any, M = any>(key: string, data: string | DataView | TypedArray, options?: ICacacheOptionsCore<M>): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
+    writeJSON<O = any, M = any>(key: string, data: any, options?: ICacacheOptionsCore<M>): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
+    writeDataAndClear<O = any, M = any>(key: string, data: string | DataView | TypedArray, options?: ICacacheOptionsCore<M>): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
+    writeJSONAndClear<O = any, M = any>(key: string, data: string | DataView | TypedArray, options?: ICacacheOptionsCore<M>): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
     removeAll(): bluebird<void>;
     remove(key: string): bluebird<void>;
+    _ssriData(data: string | DataView | TypedArray): string;
+    _ssriJSON(data: any, integrity?: string): string;
+    hashData(data: string | DataView | TypedArray): string;
+    hashJSON(data: any): string;
+    clearKey<M = any>(key: string, keepLatest: boolean): bluebird<ICacacheListEntry<M>>;
     removeContent(data_integrity: string): bluebird<void>;
     clearMemoized(): bluebird<void>;
     createTempDirPath(options?: ICacacheOptionsCore): bluebird<string>;
     withTempDirPath(options?: ICacacheOptionsCore): bluebird<string>;
+    bucketPath(key: string): {
+        fullpath: string;
+        path: string;
+    };
+    contentPath(integrity: string): {
+        fullpath: string;
+        path: string;
+    };
+    bucketEntries<M = any>(key: string): bluebird<ICacacheListEntry<M>[]>;
 }
 export declare type ICacacheAlgorithm = 'sha512' | string;
 export interface ICacacheIntegrity<T = ICacacheHash> {

@@ -5,6 +5,10 @@ import crypto = require('crypto');
 import { IOptions as IGetCachePathOptions } from 'cache-path';
 import { getCacheDirPath, debugConsole, getOptionsAsync, getOptions } from './lib/util';
 import * as fs from 'fs-extra';
+import { _bucketPath, _hashEntry } from 'cacache/lib/entry-index';
+import contentPath = require('cacache/lib/content/path');
+import * as path from 'upath2';
+import ssri = require('ssri');
 
 export interface ICacacheOptions extends ICacacheOptionsCore
 {
@@ -29,13 +33,15 @@ export interface ICacacheOptions extends ICacacheOptionsCore
 	autoCreateDir?: boolean,
 }
 
-export interface ICacacheOptionsCore
+export interface ICacacheOptionsCore<M = any>
 {
 	integrity?,
 	algorithms?: ICacacheAlgorithm,
 	memoize?,
 	uid?
 	git?
+
+	metadata?: M,
 }
 
 export interface ICacacheOptionsPlus extends ICacacheOptionsCore
@@ -70,7 +76,7 @@ export class Cacache
 
 				return new SELF_CLASS(options);
 			})
-		;
+			;
 	}
 
 	constructor(options: string | ICacacheOptions)
@@ -153,7 +159,7 @@ export class Cacache
 
 				return null;
 			})
-		;
+			;
 	}
 
 	readJSONIfExists<D = Buffer, M = any>(key: string,
@@ -219,19 +225,50 @@ export class Cacache
 			;
 	}
 
-	writeData<O = any>(key: string,
+	writeData<O = any, M = any>(key: string,
 		data: string | DataView | TypedArray,
-		options?: ICacacheOptionsCore,
+		options?: ICacacheOptionsCore<M>,
 	): bluebird<ICacacheIntegrity<ICacacheHash<O>>>
 	{
 		return bluebird
 			.resolve(cacache.put(this.cachePath, key, data, options))
+			.bind(this)
 			;
 	}
 
-	writeJSON<O = any>(key: string, data, options?: ICacacheOptionsCore)
+	writeJSON<O = any, M = any>(key: string, data, options?: ICacacheOptionsCore<M>)
 	{
-		return this.writeData<O>(key, JSON.stringify(data), options);
+		return this.writeData<O, M>(key, JSON.stringify(data), options);
+	}
+
+	writeDataAndClear<O = any, M = any>(key: string,
+		data: string | DataView | TypedArray,
+		options?: ICacacheOptionsCore<M>,
+	): bluebird<ICacacheIntegrity<ICacacheHash<O>>>
+	{
+		let self = this;
+
+		return this.writeData<O, M>(key, data, options)
+			.tap(function ()
+			{
+				return self.clearKey(key, true);
+			})
+			;
+	}
+
+	writeJSONAndClear<O = any, M = any>(key: string,
+		data: string | DataView | TypedArray,
+		options?: ICacacheOptionsCore<M>,
+	): bluebird<ICacacheIntegrity<ICacacheHash<O>>>
+	{
+		let self = this;
+
+		return this.writeJSON<O, M>(key, data, options)
+			.tap(function ()
+			{
+				return self.clearKey(key, true);
+			})
+			;
 	}
 
 	removeAll(): bluebird<void>
@@ -242,6 +279,85 @@ export class Cacache
 	remove(key: string): bluebird<void>
 	{
 		return bluebird.resolve(cacache.rm.entry(this.cachePath, key));
+	}
+
+	_ssriData(data: string | DataView | TypedArray): string
+	{
+		return ssri.fromData(data)
+	}
+
+	_ssriJSON(data, integrity?: string)
+	{
+		return this.hashData(JSON.stringify(data));
+	}
+
+	hashData(data: string | DataView | TypedArray): string
+	{
+		return ssri.stringify(this._ssriData(data));
+	}
+
+	hashJSON(data)
+	{
+		return this.hashData(JSON.stringify(data));
+	}
+
+	clearKey<M = any>(key: string, keepLatest: boolean)
+	{
+		let self = this;
+
+		return bluebird
+			.resolve(this.bucketEntries(key))
+			.bind(this)
+			.reduce(async function (latest: ICacacheListEntry<M>, next: ICacacheListEntry<M>)
+			{
+				if (next.key === key)
+				{
+					if (latest.time > next.time)
+					{
+						[latest, next] = [next, latest];
+					}
+
+					if (next.integrity != latest.integrity)
+					{
+						await self.removeContent(latest.integrity);
+					}
+
+					latest = next;
+				}
+
+				return latest;
+			})
+			.then(async function (latest)
+			{
+				if (!keepLatest)
+				{
+					await self.removeContent(latest.integrity);
+
+					return null;
+				}
+
+				return latest
+			})
+			.tap(async function (latest)
+			{
+				let bucket = self.bucketPath(key);
+
+				if (latest)
+				{
+					let entry = Object.assign({}, latest);
+
+					delete entry.path;
+
+					let stringified = JSON.stringify(entry);
+
+					await fs.writeFile(bucket.fullpath, "\n" + `${_hashEntry(stringified)}\t${stringified}`)
+				}
+				else
+				{
+					await fs.remove(bucket.fullpath)
+				}
+			})
+			;
 	}
 
 	removeContent(data_integrity: string): bluebird<void>
@@ -266,6 +382,82 @@ export class Cacache
 		{
 			cacache.tmp.withTmp(this.cachePath, resolve, options)
 		});
+	}
+
+	bucketPath(key: string)
+	{
+		let fullpath: string = _bucketPath(this.cachePath, key);
+
+		let p = path.relative(this.cachePath, fullpath);
+
+		return {
+			fullpath,
+			path: p,
+		}
+	}
+
+	contentPath(integrity: string)
+	{
+		let fullpath: string = contentPath(this.cachePath, integrity);
+
+		let p = path.relative(this.cachePath, fullpath);
+
+		return {
+			fullpath,
+			path: p,
+		}
+	}
+
+	bucketEntries<M = any>(key: string)
+	{
+		let self = this;
+
+		return bluebird.resolve()
+			.bind(this)
+			.then(function (this: Cacache)
+			{
+				let bucket = self.bucketPath(key);
+
+				return fs.readFile(bucket.fullpath, 'utf8')
+					.then(data =>
+					{
+						let entries = [] as ICacacheListEntry<M>[];
+
+						data.split('\n').forEach(entry =>
+						{
+							if (!entry)
+							{
+								return
+							}
+							const pieces = entry.split('\t');
+							if (!pieces[1] || _hashEntry(pieces[1]) !== pieces[0])
+							{
+								// Hash is no good! Corruption or malice? Doesn't matter!
+								// EJECT EJECT
+								return
+							}
+							let obj;
+							try
+							{
+								obj = JSON.parse(pieces[1])
+							}
+							catch (e)
+							{
+								// Entry is corrupted!
+								return
+							}
+							if (obj)
+							{
+								obj.path = self.contentPath(obj.integrity).fullpath;
+
+								entries.push(obj)
+							}
+						});
+						return entries
+					})
+					;
+			})
+			;
 	}
 }
 
