@@ -2,6 +2,7 @@
 import bluebird = require('bluebird');
 import TypedArray = NodeJS.TypedArray;
 import { IOptions as IGetCachePathOptions } from 'cache-path';
+import EventEmitterAsync from './lib/event';
 export interface ICacacheOptions extends ICacacheOptionsCore {
     /**
      * name for auto create cachePath
@@ -32,7 +33,7 @@ export interface ICacacheOptionsCore<M = any> {
 export interface ICacacheOptionsPlus extends ICacacheOptionsCore {
     ttl?: number;
 }
-export declare class Cacache {
+export declare class Cacache extends EventEmitterAsync {
     cachePath: string;
     static getHashes(): string[];
     static create(options?: string | ICacacheOptions): Cacache;
@@ -70,6 +71,7 @@ export declare class Cacache {
         path: string;
     };
     bucketEntries<M = any>(key: string): bluebird<ICacacheListEntry<M>[]>;
+    destroy(): bluebird<boolean>;
 }
 export declare type ICacacheAlgorithm = 'sha512' | string;
 export interface ICacacheIntegrity<T = ICacacheHash> {

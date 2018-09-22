@@ -3,6 +3,7 @@ import bluebird = require('bluebird');
 import TypedArray = NodeJS.TypedArray;
 import crypto = require('crypto');
 import { IOptions as IGetCachePathOptions } from 'cache-path';
+import EventEmitterAsync from './lib/event';
 import { getCacheDirPath, debugConsole, getOptionsAsync, getOptions, deleteEmpty } from './lib/util';
 import * as fs from 'fs-extra';
 import { _bucketPath, _hashEntry } from 'cacache/lib/entry-index';
@@ -49,7 +50,7 @@ export interface ICacacheOptionsPlus extends ICacacheOptionsCore
 	ttl?: number,
 }
 
-export class Cacache
+export class Cacache extends EventEmitterAsync
 {
 	cachePath: string;
 
@@ -81,6 +82,8 @@ export class Cacache
 
 	constructor(options: string | ICacacheOptions)
 	{
+		super();
+
 		options = getOptions(options);
 
 		if (!options.cachePath)
@@ -460,6 +463,21 @@ export class Cacache
 					;
 			})
 			;
+	}
+
+	destroy()
+	{
+		let self = this;
+
+		return bluebird
+			.resolve(self.emit('destroy'))
+			.tap(function ()
+			{
+				return bluebird.all([
+					self.removeAllListeners(),
+				])
+			})
+		;
 	}
 }
 

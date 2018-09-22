@@ -2,13 +2,14 @@
 const cacache = require("cacache");
 const bluebird = require("bluebird");
 const crypto = require("crypto");
+const event_1 = require("./lib/event");
 const util_1 = require("./lib/util");
 const fs = require("fs-extra");
 const entry_index_1 = require("cacache/lib/entry-index");
 const contentPath = require("cacache/lib/content/path");
 const path = require("upath2");
 const ssri = require("ssri");
-class Cacache {
+class Cacache extends event_1.default {
     static getHashes() {
         return crypto.getHashes();
     }
@@ -26,6 +27,7 @@ class Cacache {
         });
     }
     constructor(options) {
+        super();
         options = util_1.getOptions(options);
         if (!options.cachePath) {
             let err = new Error(`name or cachePath is undefined`);
@@ -251,6 +253,16 @@ class Cacache {
                 });
                 return entries;
             });
+        });
+    }
+    destroy() {
+        let self = this;
+        return bluebird
+            .resolve(self.emit('destroy'))
+            .tap(function () {
+            return bluebird.all([
+                self.removeAllListeners(),
+            ]);
         });
     }
 }
