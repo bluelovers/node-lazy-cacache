@@ -57,7 +57,7 @@ export declare class Cacache extends EventEmitterAsync {
     _ssriJSON(data: any, integrity?: string): string;
     hashData(data: string | DataView | TypedArray): string;
     hashJSON(data: any): string;
-    clearKey<M = any>(key: string, keepLatest: boolean): bluebird<ICacacheListEntry<M>>;
+    clearKey<M = any>(key: string, keepLatest?: boolean): bluebird<ICacacheListEntry<M>>;
     removeContent(data_integrity: string): bluebird<void>;
     clearMemoized(): bluebird<void>;
     createTempDirPath(options?: ICacacheOptionsCore): bluebird<string>;

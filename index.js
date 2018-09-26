@@ -155,24 +155,30 @@ class Cacache extends event_1.default {
         return bluebird
             .resolve(this.bucketEntries(key))
             .bind(this)
-            .reduce(async function (latest, next) {
-            if (next.key === key) {
-                if (latest.time > next.time) {
-                    [latest, next] = [next, latest];
-                }
-                if (next.integrity != latest.integrity) {
-                    await self.removeContent(latest.integrity);
-                }
-                latest = next;
-            }
-            return latest;
-        })
-            .then(async function (latest) {
-            if (!keepLatest) {
-                await self.removeContent(latest.integrity);
+            .then(function (ls) {
+            if (!ls) {
                 return null;
             }
-            return latest;
+            return bluebird
+                .reduce(ls, async function (latest, next) {
+                if (next.key === key) {
+                    if (latest.time > next.time) {
+                        [latest, next] = [next, latest];
+                    }
+                    if (next.integrity != latest.integrity) {
+                        await self.removeContent(latest.integrity);
+                    }
+                    latest = next;
+                }
+                return latest;
+            })
+                .then(async function (latest) {
+                if (!keepLatest) {
+                    await self.removeContent(latest.integrity);
+                    return null;
+                }
+                return latest;
+            });
         })
             .tap(async function (latest) {
             let bucket = self.bucketPath(key);
@@ -225,6 +231,9 @@ class Cacache extends event_1.default {
             .bind(this)
             .then(function () {
             let bucket = self.bucketPath(key);
+            if (!fs.existsSync(bucket.fullpath)) {
+                return null;
+            }
             return fs.readFile(bucket.fullpath, 'utf8')
                 .then(data => {
                 let entries = [];

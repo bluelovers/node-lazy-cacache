@@ -304,42 +304,51 @@ export class Cacache extends EventEmitterAsync
 		return this.hashData(JSON.stringify(data));
 	}
 
-	clearKey<M = any>(key: string, keepLatest: boolean)
+	clearKey<M = any>(key: string, keepLatest?: boolean)
 	{
 		let self = this;
 
 		return bluebird
 			.resolve(this.bucketEntries(key))
 			.bind(this)
-			.reduce(async function (latest: ICacacheListEntry<M>, next: ICacacheListEntry<M>)
+			.then(function (ls)
 			{
-				if (next.key === key)
+				if (!ls)
 				{
-					if (latest.time > next.time)
-					{
-						[latest, next] = [next, latest];
-					}
-
-					if (next.integrity != latest.integrity)
-					{
-						await self.removeContent(latest.integrity);
-					}
-
-					latest = next;
-				}
-
-				return latest;
-			})
-			.then(async function (latest)
-			{
-				if (!keepLatest)
-				{
-					await self.removeContent(latest.integrity);
-
 					return null;
 				}
 
-				return latest
+				return bluebird
+					.reduce(ls, async function (latest: ICacacheListEntry<M>, next: ICacacheListEntry<M>)
+					{
+						if (next.key === key)
+						{
+							if (latest.time > next.time)
+							{
+								[latest, next] = [next, latest];
+							}
+
+							if (next.integrity != latest.integrity)
+							{
+								await self.removeContent(latest.integrity);
+							}
+
+							latest = next;
+						}
+
+						return latest;
+					})
+					.then(async function (latest)
+					{
+						if (!keepLatest)
+						{
+							await self.removeContent(latest.integrity);
+
+							return null;
+						}
+
+						return latest
+					})
 			})
 			.tap(async function (latest)
 			{
@@ -423,6 +432,11 @@ export class Cacache extends EventEmitterAsync
 			{
 				let bucket = self.bucketPath(key);
 
+				if (!fs.existsSync(bucket.fullpath))
+				{
+					return null;
+				}
+
 				return fs.readFile(bucket.fullpath, 'utf8')
 					.then(data =>
 					{
@@ -477,7 +491,7 @@ export class Cacache extends EventEmitterAsync
 					self.removeAllListeners(),
 				])
 			})
-		;
+			;
 	}
 }
 

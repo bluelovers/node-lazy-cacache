@@ -1,6 +1,6 @@
 {
   "name": "lazy-cacache",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "a wrap class of cacache",
   "homepage": "https://github.com/bluelovers/node-lazy-cacache#readme",
   "bugs": {
@@ -28,8 +28,12 @@
     "debug-color2": "^1.0.6",
     "delete-empty": "^2.0.0",
     "fs-extra": "^7.0.0",
+    "memfs": "^2.10.0",
     "ssri": "^6.0.1",
+    "unionfs": "^3.0.2",
     "upath2": "^2.1.2"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/node": "^10"
+  }
 }
