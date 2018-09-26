@@ -6,9 +6,8 @@ const event_1 = require("./lib/event");
 const util_1 = require("./lib/util");
 const fs = require("fs-extra");
 const entry_index_1 = require("cacache/lib/entry-index");
-const contentPath = require("cacache/lib/content/path");
-const path = require("upath2");
 const ssri = require("ssri");
+const util = require("./lib/util");
 class Cacache extends event_1.default {
     static getHashes() {
         return crypto.getHashes();
@@ -139,7 +138,7 @@ class Cacache extends event_1.default {
         return bluebird.resolve(cacache.rm.entry(this.cachePath, key));
     }
     _ssriData(data) {
-        return ssri.fromData(data);
+        return util.ssriData(data);
     }
     _ssriJSON(data, integrity) {
         return this.hashData(JSON.stringify(data));
@@ -210,20 +209,10 @@ class Cacache extends event_1.default {
         });
     }
     bucketPath(key) {
-        let fullpath = entry_index_1._bucketPath(this.cachePath, key);
-        let p = path.relative(this.cachePath, fullpath);
-        return {
-            fullpath,
-            path: p,
-        };
+        return util.bucketPath(key, this.cachePath);
     }
     contentPath(integrity) {
-        let fullpath = contentPath(this.cachePath, integrity);
-        let p = path.relative(this.cachePath, fullpath);
-        return {
-            fullpath,
-            path: p,
-        };
+        return util.contentPath(integrity, this.cachePath);
     }
     bucketEntries(key) {
         let self = this;

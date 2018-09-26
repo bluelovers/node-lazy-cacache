@@ -10,6 +10,7 @@ import { _bucketPath, _hashEntry } from 'cacache/lib/entry-index';
 import contentPath = require('cacache/lib/content/path');
 import * as path from 'upath2';
 import ssri = require('ssri');
+import util = require('./lib/util');
 
 export interface ICacacheOptions extends ICacacheOptionsCore
 {
@@ -286,7 +287,7 @@ export class Cacache extends EventEmitterAsync
 
 	_ssriData(data: string | DataView | TypedArray): string
 	{
-		return ssri.fromData(data)
+		return util.ssriData(data)
 	}
 
 	_ssriJSON(data, integrity?: string)
@@ -400,26 +401,12 @@ export class Cacache extends EventEmitterAsync
 
 	bucketPath(key: string)
 	{
-		let fullpath: string = _bucketPath(this.cachePath, key);
-
-		let p = path.relative(this.cachePath, fullpath);
-
-		return {
-			fullpath,
-			path: p,
-		}
+		return util.bucketPath(key, this.cachePath);
 	}
 
 	contentPath(integrity: string)
 	{
-		let fullpath: string = contentPath(this.cachePath, integrity);
-
-		let p = path.relative(this.cachePath, fullpath);
-
-		return {
-			fullpath,
-			path: p,
-		}
+		return util.contentPath(integrity, this.cachePath);
 	}
 
 	bucketEntries<M = any>(key: string)
