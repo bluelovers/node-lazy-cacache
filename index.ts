@@ -81,7 +81,7 @@ export class Cacache extends EventEmitterAsync
 			;
 	}
 
-	constructor(options?: string | ICacacheOptions)
+	constructor(options: string | ICacacheOptions)
 	{
 		super();
 
@@ -382,8 +382,12 @@ export class Cacache extends EventEmitterAsync
 
 	clearMemoized()
 	{
-		cacache.clearMemoized();
-		return bluebird.resolve();
+		return bluebird.resolve()
+			.tap(function ()
+			{
+				return cacache.clearMemoized()
+			})
+			;
 	}
 
 	createTempDirPath(options?: ICacacheOptionsCore): bluebird<string>

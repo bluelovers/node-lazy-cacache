@@ -197,8 +197,10 @@ class Cacache extends event_1.default {
         return bluebird.resolve(cacache.rm.content(this.cachePath, data_integrity));
     }
     clearMemoized() {
-        cacache.clearMemoized();
-        return bluebird.resolve();
+        return bluebird.resolve()
+            .tap(function () {
+            return cacache.clearMemoized();
+        });
     }
     createTempDirPath(options) {
         return bluebird.resolve(cacache.tmp.mkdir(this.cachePath, options));
