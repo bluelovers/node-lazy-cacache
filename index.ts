@@ -7,8 +7,6 @@ import EventEmitterAsync from './lib/event';
 import { getCacheDirPath, debugConsole, getOptionsAsync, getOptions, deleteEmpty } from './lib/util';
 import * as fs from 'fs-extra';
 import { _bucketPath, _hashEntry } from 'cacache/lib/entry-index';
-import contentPath = require('cacache/lib/content/path');
-import * as path from 'upath2';
 import ssri = require('ssri');
 import util = require('./lib/util');
 
@@ -60,7 +58,7 @@ export class Cacache extends EventEmitterAsync
 		return crypto.getHashes();
 	}
 
-	static create(options?: string | ICacacheOptions)
+	static create(options: string | ICacacheOptions)
 	{
 		let SELF_CLASS = this;
 		return new SELF_CLASS(options);
@@ -166,7 +164,7 @@ export class Cacache extends EventEmitterAsync
 			;
 	}
 
-	readJSONIfExists<D = Buffer, M = any>(key: string,
+	readJSONIfExists<D = any, M = any>(key: string,
 		options?: ICacacheOptionsPlus,
 	): bluebird<ICacacheJSON<D, M>>
 	{
@@ -261,7 +259,7 @@ export class Cacache extends EventEmitterAsync
 	}
 
 	writeJSONAndClear<O = any, M = any>(key: string,
-		data: string | DataView | TypedArray,
+		data,
 		options?: ICacacheOptionsCore<M>,
 	): bluebird<ICacacheIntegrity<ICacacheHash<O>>>
 	{

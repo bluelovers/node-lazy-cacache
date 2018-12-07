@@ -36,21 +36,21 @@ export interface ICacacheOptionsPlus extends ICacacheOptionsCore {
 export declare class Cacache extends EventEmitterAsync {
     cachePath: string;
     static getHashes(): string[];
-    static create(options?: string | ICacacheOptions): Cacache;
+    static create(options: string | ICacacheOptions): Cacache;
     static createAsync(options?: string | ICacacheOptions): bluebird<Cacache>;
     constructor(options: string | ICacacheOptions);
     list<M>(): bluebird<ICacacheList<M>>;
     readData<D = Buffer, M = any>(key: string, options?: ICacacheOptionsCore): bluebird<ICacacheData<D, M>>;
     readJSON<D = any, M = any>(key: string, options?: ICacacheOptionsCore): bluebird<ICacacheJSON<D, M>>;
     readDataIfExists<D = Buffer, M = any>(key: string, options?: ICacacheOptionsPlus): bluebird<ICacacheData<D, M>>;
-    readJSONIfExists<D = Buffer, M = any>(key: string, options?: ICacacheOptionsPlus): bluebird<ICacacheJSON<D, M>>;
+    readJSONIfExists<D = any, M = any>(key: string, options?: ICacacheOptionsPlus): bluebird<ICacacheJSON<D, M>>;
     readDataInfo<M>(key: string, options?: ICacacheOptionsCore): bluebird<ICacacheListEntry<M>>;
     hasContent<O>(integrity: string): bluebird<ICacacheDataHasContent<O>>;
     hasData<M>(key: string, options?: ICacacheOptionsPlus): bluebird<ICacacheListEntry<M>>;
     writeData<O = any, M = any>(key: string, data: string | DataView | TypedArray, options?: ICacacheOptionsCore<M>): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
     writeJSON<O = any, M = any>(key: string, data: any, options?: ICacacheOptionsCore<M>): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
     writeDataAndClear<O = any, M = any>(key: string, data: string | DataView | TypedArray, options?: ICacacheOptionsCore<M>): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
-    writeJSONAndClear<O = any, M = any>(key: string, data: string | DataView | TypedArray, options?: ICacacheOptionsCore<M>): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
+    writeJSONAndClear<O = any, M = any>(key: string, data: any, options?: ICacacheOptionsCore<M>): bluebird<ICacacheIntegrity<ICacacheHash<O>>>;
     removeAll(): bluebird<void>;
     remove(key: string): bluebird<void>;
     _ssriData(data: string | DataView | TypedArray): string;
