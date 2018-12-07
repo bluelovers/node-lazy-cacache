@@ -38,7 +38,7 @@ export declare class Cacache extends EventEmitterAsync {
     static getHashes(): string[];
     static create(options?: string | ICacacheOptions): Cacache;
     static createAsync(options?: string | ICacacheOptions): bluebird<Cacache>;
-    constructor(options: string | ICacacheOptions);
+    constructor(options?: string | ICacacheOptions);
     list<M>(): bluebird<ICacacheList<M>>;
     readData<D = Buffer, M = any>(key: string, options?: ICacacheOptionsCore): bluebird<ICacacheData<D, M>>;
     readJSON<D = any, M = any>(key: string, options?: ICacacheOptionsCore): bluebird<ICacacheJSON<D, M>>;

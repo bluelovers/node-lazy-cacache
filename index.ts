@@ -81,7 +81,7 @@ export class Cacache extends EventEmitterAsync
 			;
 	}
 
-	constructor(options: string | ICacacheOptions)
+	constructor(options?: string | ICacacheOptions)
 	{
 		super();
 
