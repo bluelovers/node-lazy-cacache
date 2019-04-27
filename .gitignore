@@ -56,3 +56,4 @@ gen
 *.test.js.map
 /bin/*.d.ts
 /bin/*.js
+/test/

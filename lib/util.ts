@@ -2,7 +2,7 @@ import { _bucketPath } from 'cacache/lib/entry-index';
 import { getCachePath, findNpmCachePath, getOSTempPath, findPkgModulePath, getCachePathAsync } from 'cache-path';
 import bluebird = require('bluebird');
 import { Console } from 'debug-color2';
-import * as path from 'upath2';
+import path = require('upath2');
 import { ICacacheOptions } from '../index';
 import deleteEmpty = require('delete-empty');
 import _contentPath = require('cacache/lib/content/path');

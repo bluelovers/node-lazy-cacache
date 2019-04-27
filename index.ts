@@ -5,7 +5,7 @@ import crypto = require('crypto');
 import { IOptions as IGetCachePathOptions } from 'cache-path';
 import EventEmitterAsync from './lib/event';
 import { getCacheDirPath, debugConsole, getOptionsAsync, getOptions, deleteEmpty } from './lib/util';
-import * as fs from 'fs-extra';
+import fs = require('fs-extra');
 import { _bucketPath, _hashEntry } from 'cacache/lib/entry-index';
 import ssri = require('ssri');
 import util = require('./lib/util');
