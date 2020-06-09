@@ -1,6 +1,6 @@
 {
   "name": "lazy-cacache",
-  "version": "1.0.9",
+  "version": "2.0.0",
   "description": "a wrap class of cacache",
   "keywords": [],
   "homepage": "https://github.com/bluelovers/node-lazy-cacache#readme",
@@ -47,9 +47,9 @@
     "@types/jest": "^26.0.0",
     "@types/node": "^14",
     "@types/ssri": "^6.0.3",
-    "ts-jest": "^26.1.0",
     "jest": "^26.0.1",
     "memfs": "^3.2.0",
+    "ts-jest": "^26.1.0",
     "unionfs": "^4.4.0"
   }
 }
