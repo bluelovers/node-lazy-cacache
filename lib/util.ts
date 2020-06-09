@@ -1,13 +1,14 @@
 import { _bucketPath } from 'cacache/lib/entry-index';
 import { getCachePath, findNpmCachePath, getOSTempPath, findPkgModulePath, getCachePathAsync } from 'cache-path';
-import bluebird = require('bluebird');
+import Bluebird from 'bluebird';
 import { Console } from 'debug-color2';
-import path = require('upath2');
-import { ICacacheOptions } from '../index';
-import deleteEmpty = require('delete-empty');
-import _contentPath = require('cacache/lib/content/path');
-import ssri = require('ssri');
+import path from 'upath2';
+import deleteEmpty from 'delete-empty';
+import _contentPath from 'cacache/lib/content/path';
+import ssri from 'ssri';
+
 import TypedArray = NodeJS.TypedArray;
+import { ICacacheOptions } from './types';
 
 export { deleteEmpty }
 
@@ -36,7 +37,7 @@ export function enableDebug(bool?: boolean)
 	return debugConsole.enabled;
 }
 
-export function getCacheDirPath(name: string, options: ICacacheOptions, isAsync: true): bluebird<string>
+export function getCacheDirPath(name: string, options: ICacacheOptions, isAsync: true): Bluebird<string>
 export function getCacheDirPath(name: string, options: ICacacheOptions, isAsync?: boolean): string
 export function getCacheDirPath(name: string, options: ICacacheOptions, isAsync?: boolean)
 {
@@ -72,19 +73,19 @@ export function getCacheDirPath(name: string, options: ICacacheOptions, isAsync?
 
 	let fn = isAsync ? getCachePathAsync : getCachePath;
 
-	return fn(opts);
+	return fn(opts) as any;
 }
 
-export function getOptions(options?: string | ICacacheOptions)
+export function getOptions(options?: string | ICacacheOptions): ICacacheOptions
 {
 	if (typeof options === 'string')
 	{
 		options = {
 			name: options,
-		}
+		} as ICacacheOptions
 	}
 
-	options = options || {};
+	options = options || {} as ICacacheOptions;
 
 	if (!options.cachePath && options.name)
 	{
@@ -96,7 +97,7 @@ export function getOptions(options?: string | ICacacheOptions)
 	return options;
 }
 
-export function getOptionsAsync(options?: string | ICacacheOptions)
+export function getOptionsAsync(options?: string | ICacacheOptions): Bluebird<ICacacheOptions>
 {
 	if (typeof options === 'string')
 	{
@@ -105,8 +106,8 @@ export function getOptionsAsync(options?: string | ICacacheOptions)
 		}
 	}
 
-	return bluebird.resolve(options || {})
-		.then(async function (options: ICacacheOptions)
+	return Bluebird.resolve<ICacacheOptions>(options || {})
+		.then<ICacacheOptions>(async function (options: ICacacheOptions)
 		{
 			if (!options.cachePath && options.name)
 			{
@@ -146,7 +147,7 @@ export function contentPath(integrity: string, cachePath: string)
 
 export function ssriData(data: string | DataView | TypedArray): string
 {
-	return ssri.fromData(data)
+	return ssri.fromData(data) as any
 }
 
 export function ssriJSON(data, integrity?: string): string
@@ -159,5 +160,4 @@ export function hashData(data: string | DataView | TypedArray): string
 	return ssri.stringify(ssriData(data));
 }
 
-// @ts-ignore
-exports = Object.freeze(exports);
+export default exports as typeof import('./util')

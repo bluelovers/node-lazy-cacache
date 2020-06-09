@@ -1,13 +1,14 @@
-const EventEmitter = require('events');
-import bluebird = require('bluebird');
+import { EventEmitter } from 'events';
+import Bluebird from 'bluebird';
 
 export class EventEmitterAsync extends EventEmitter
 {
-	emit(event: string | symbol, ...args: any[]): bluebird<boolean>
+	// @ts-ignore
+	emit(event: string | symbol, ...args: any[]): Bluebird<boolean>
 	{
 		let self = this;
 
-		return bluebird
+		return Bluebird
 			.mapSeries(self.rawListeners(event), async (fn) =>
 			{
 				// @ts-ignore
@@ -20,11 +21,11 @@ export class EventEmitterAsync extends EventEmitter
 			;
 	}
 
-	emitWithEventName(event: string | symbol, ...args: any[]): bluebird<boolean>
+	emitWithEventName(event: string | symbol, ...args: any[]): Bluebird<boolean>
 	{
 		let self = this;
 
-		return bluebird
+		return Bluebird
 			.mapSeries(self.rawListeners(event), async (fn) =>
 			{
 				// @ts-ignore

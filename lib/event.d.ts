@@ -1,7 +1,8 @@
-declare const EventEmitter: any;
-import bluebird = require('bluebird');
+/// <reference types="node" />
+import { EventEmitter } from 'events';
+import Bluebird from 'bluebird';
 export declare class EventEmitterAsync extends EventEmitter {
-    emit(event: string | symbol, ...args: any[]): bluebird<boolean>;
-    emitWithEventName(event: string | symbol, ...args: any[]): bluebird<boolean>;
+    emit(event: string | symbol, ...args: any[]): Bluebird<boolean>;
+    emitWithEventName(event: string | symbol, ...args: any[]): Bluebird<boolean>;
 }
 export default EventEmitterAsync;

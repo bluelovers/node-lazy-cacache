@@ -1,5 +1,5 @@
 import Cacache from '../index';
-import * as path from 'path';
+import path from 'path';
 
 (async () => {
 
