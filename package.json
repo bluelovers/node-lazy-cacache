@@ -31,7 +31,7 @@
   "dependencies": {
     "bluebird": "^3",
     "cacache": "^15",
-    "cache-path": "^1",
+    "cache-path": "^2",
     "debug-color2": "^1",
     "delete-empty": "^3",
     "fs-extra": "^9",
@@ -39,17 +39,17 @@
     "upath2": "^3"
   },
   "devDependencies": {
-    "@bluelovers/tsconfig": "^1.0.19",
+    "@bluelovers/tsconfig": "^1.0.20",
     "@types/bluebird": "^3",
     "@types/cacache": "^12.0.1",
-    "@types/delete-empty": "^2.0.0",
+    "@types/delete-empty": "^3.0.0",
     "@types/fs-extra": "^9.0.1",
-    "@types/jest": "^26.0.0",
+    "@types/jest": "^26.0.9",
     "@types/node": "^14",
-    "@types/ssri": "^6.0.3",
-    "jest": "^26.0.1",
+    "@types/ssri": "^7.1.0",
+    "jest": "^26.2.2",
     "memfs": "^3.2.0",
-    "ts-jest": "^26.1.0",
+    "ts-jest": "^26.1.4",
     "unionfs": "^4.4.0"
   }
 }
