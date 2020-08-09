@@ -1,5 +1,5 @@
 import { _bucketPath } from 'cacache/lib/entry-index';
-import { getCachePath, findNpmCachePath, getOSTempPath, findPkgModulePath, getCachePathAsync } from 'cache-path';
+import { getCachePath, findNpmCachePath, findYarnCachePath, findOSTempPath, findPkgModulePath, getCachePathAsync } from 'cache-path';
 import Bluebird from 'bluebird';
 import { Console } from 'debug-color2';
 import path from 'upath2';
@@ -53,8 +53,9 @@ export function getCacheDirPath(name: string, options: ICacacheOptions, isAsync?
 	if (options.useGlobalCache)
 	{
 		fnOrder.push(...[
+			findYarnCachePath,
 			findNpmCachePath,
-			getOSTempPath,
+			findOSTempPath,
 			findPkgModulePath,
 		]);
 	}
