@@ -1,4 +1,5 @@
 /// <reference types="node" />
+/// <reference types="node" />
 import Bluebird from 'bluebird';
 import EventEmitterAsync from './lib/event';
 import { ICacacheDataHasContent, ICacacheJSON, ICacacheData, ICacacheList, ICacacheListEntry, ICacacheHash, ICacacheIntegrity, ICacacheOptionsPlus, ICacacheOptionsCore, ICacacheOptions } from './lib/types';

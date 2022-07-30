@@ -3,7 +3,7 @@ import Bluebird from 'bluebird';
 import crypto from 'crypto';
 import EventEmitterAsync from './lib/event';
 import util, { debugConsole, getOptionsAsync, getOptions, deleteEmpty } from './lib/util';
-import fs from 'fs-extra';
+import { ensureDirSync, existsSync, writeFile, remove, readFile } from 'fs-extra';
 import { _hashEntry } from 'cacache/lib/entry-index';
 import ssri from 'ssri';
 import {
@@ -71,12 +71,12 @@ export class Cacache extends EventEmitterAsync
 
 		this.cachePath = options.cachePath;
 
-		if (!fs.existsSync(this.cachePath))
+		if (!existsSync(this.cachePath))
 		{
 			if (options.autoCreateDir)
 			{
 				debugConsole.debug(`auto create cachePath: ${this.cachePath}`);
-				fs.ensureDirSync(this.cachePath)
+				ensureDirSync(this.cachePath)
 			}
 			else
 			{
@@ -336,11 +336,11 @@ export class Cacache extends EventEmitterAsync
 
 					let stringified = JSON.stringify(entry);
 
-					await fs.writeFile(bucket.fullpath, "\n" + `${_hashEntry(stringified)}\t${stringified}`)
+					await writeFile(bucket.fullpath, "\n" + `${_hashEntry(stringified)}\t${stringified}`)
 				}
 				else
 				{
-					await fs.remove(bucket.fullpath)
+					await remove(bucket.fullpath)
 				}
 
 				await deleteEmpty(self.cachePath);
@@ -396,12 +396,12 @@ export class Cacache extends EventEmitterAsync
 			{
 				let bucket = self.bucketPath(key);
 
-				if (!fs.existsSync(bucket.fullpath))
+				if (!existsSync(bucket.fullpath))
 				{
 					return null;
 				}
 
-				return fs.readFile(bucket.fullpath, 'utf8')
+				return readFile(bucket.fullpath, 'utf8')
 					.then(data =>
 					{
 						let entries = [] as ICacacheListEntry<M>[];

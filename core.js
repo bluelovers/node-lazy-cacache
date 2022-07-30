@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -31,7 +35,7 @@ const bluebird_1 = __importDefault(require("bluebird"));
 const crypto_1 = __importDefault(require("crypto"));
 const event_1 = __importDefault(require("./lib/event"));
 const util_1 = __importStar(require("./lib/util"));
-const fs_extra_1 = __importDefault(require("fs-extra"));
+const fs_extra_1 = require("fs-extra");
 const entry_index_1 = require("cacache/lib/entry-index");
 const ssri_1 = __importDefault(require("ssri"));
 __exportStar(require("./lib/types"), exports);
@@ -40,7 +44,7 @@ class Cacache extends event_1.default {
         super();
         this.Cacache = Cacache;
         this.default = Cacache;
-        options = util_1.getOptions(options);
+        options = (0, util_1.getOptions)(options);
         if (!options.cachePath) {
             let err = new Error(`name or cachePath is undefined`);
             // @ts-ignore
@@ -48,10 +52,10 @@ class Cacache extends event_1.default {
             throw err;
         }
         this.cachePath = options.cachePath;
-        if (!fs_extra_1.default.existsSync(this.cachePath)) {
+        if (!(0, fs_extra_1.existsSync)(this.cachePath)) {
             if (options.autoCreateDir) {
                 util_1.debugConsole.debug(`auto create cachePath: ${this.cachePath}`);
-                fs_extra_1.default.ensureDirSync(this.cachePath);
+                (0, fs_extra_1.ensureDirSync)(this.cachePath);
             }
             else {
                 throw new Error(`發生錯誤 快取目錄不存在 '${this.cachePath}'`);
@@ -71,7 +75,7 @@ class Cacache extends event_1.default {
         return bluebird_1.default.resolve()
             .bind(SELF_CLASS)
             .then(async function () {
-            options = await util_1.getOptionsAsync(options);
+            options = await (0, util_1.getOptionsAsync)(options);
             return new SELF_CLASS(options);
         });
     }
@@ -215,12 +219,12 @@ class Cacache extends event_1.default {
                 let entry = Object.assign({}, latest);
                 delete entry.path;
                 let stringified = JSON.stringify(entry);
-                await fs_extra_1.default.writeFile(bucket.fullpath, "\n" + `${entry_index_1._hashEntry(stringified)}\t${stringified}`);
+                await (0, fs_extra_1.writeFile)(bucket.fullpath, "\n" + `${(0, entry_index_1._hashEntry)(stringified)}\t${stringified}`);
             }
             else {
-                await fs_extra_1.default.remove(bucket.fullpath);
+                await (0, fs_extra_1.remove)(bucket.fullpath);
             }
-            await util_1.deleteEmpty(self.cachePath);
+            await (0, util_1.deleteEmpty)(self.cachePath);
         });
     }
     removeContent(data_integrity) {
@@ -252,10 +256,10 @@ class Cacache extends event_1.default {
             .bind(this)
             .then(function () {
             let bucket = self.bucketPath(key);
-            if (!fs_extra_1.default.existsSync(bucket.fullpath)) {
+            if (!(0, fs_extra_1.existsSync)(bucket.fullpath)) {
                 return null;
             }
-            return fs_extra_1.default.readFile(bucket.fullpath, 'utf8')
+            return (0, fs_extra_1.readFile)(bucket.fullpath, 'utf8')
                 .then(data => {
                 let entries = [];
                 data.split('\n').forEach(entry => {
@@ -263,7 +267,7 @@ class Cacache extends event_1.default {
                         return;
                     }
                     const pieces = entry.split('\t');
-                    if (!pieces[1] || entry_index_1._hashEntry(pieces[1]) !== pieces[0]) {
+                    if (!pieces[1] || (0, entry_index_1._hashEntry)(pieces[1]) !== pieces[0]) {
                         // Hash is no good! Corruption or malice? Doesn't matter!
                         // EJECT EJECT
                         return;

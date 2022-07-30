@@ -2,6 +2,7 @@
  * Created by user on 2020/6/10.
  */
 /// <reference types="node" />
+/// <reference types="node" />
 import { IOptions as IGetCachePathOptions } from 'cache-path';
 import TypedArray = NodeJS.TypedArray;
 export type { TypedArray };

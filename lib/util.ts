@@ -2,7 +2,7 @@ import { _bucketPath } from 'cacache/lib/entry-index';
 import { getCachePath, findNpmCachePath, findYarnCachePath, findOSTempPath, findPkgModulePath, getCachePathAsync } from 'cache-path';
 import Bluebird from 'bluebird';
 import { Console } from 'debug-color2';
-import path from 'upath2';
+import { relative } from 'upath2';
 import deleteEmpty from 'delete-empty';
 import _contentPath from 'cacache/lib/content/path';
 import ssri from 'ssri';
@@ -126,7 +126,7 @@ export function bucketPath(key: string, cachePath: string)
 {
 	let fullpath: string = _bucketPath(cachePath, key);
 
-	let p = path.relative(cachePath, fullpath);
+	let p = relative(cachePath, fullpath);
 
 	return {
 		fullpath,
@@ -138,7 +138,7 @@ export function contentPath(integrity: string, cachePath: string)
 {
 	let fullpath: string = _contentPath(cachePath, integrity);
 
-	let p = path.relative(cachePath, fullpath);
+	let p = relative(cachePath, fullpath);
 
 	return {
 		fullpath,
