@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.2](https://github.com/bluelovers/node-lazy-cacache/compare/lazy-cacache@2.0.4...lazy-cacache@3.0.2) (2022-07-30)
+
+
+### 🚨　Tests
+
+* update test ([d855a78](https://github.com/bluelovers/node-lazy-cacache/commit/d855a78eb71b38c107299e7e79740f7e0ee714e6))
+
+
+### 📌　Dependencies
+
+* update deps ([8f5d601](https://github.com/bluelovers/node-lazy-cacache/commit/8f5d60115e80ca39199ef7c5f320d7bd3b4fb7d8))
+
+
+
+
+
 ## 2.0.4 (2020-08-09)
 
 
