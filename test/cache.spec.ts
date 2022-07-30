@@ -55,7 +55,7 @@ function _setup(cache: Cacache | Promise<Cacache>)
 		data: 222,
 	} as const;
 
-	beforeAll(async (done) =>
+	beforeAll(async () =>
 	{
 		cache = await cache as Cacache;
 
@@ -66,11 +66,9 @@ function _setup(cache: Cacache | Promise<Cacache>)
 
 		actual1 = await cache.writeData(key1, expected1);
 		actual2 = await cache.writeJSON(key2, expected2);
-
-		done();
 	})
 
-	test(`readDataInfo`, async (done) =>
+	test(`readDataInfo`, async () =>
 	{
 		cache = await cache as Cacache;
 
@@ -111,6 +109,5 @@ function _setup(cache: Cacache | Promise<Cacache>)
 		//expect(actual).toBeInstanceOf(Date);
 		//expect(actual).toMatchSnapshot();
 
-		done();
 	});
 }
